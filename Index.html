@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PerfectK — 인디게임 스튜디오</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,700;0,800;0,900;1,900&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+:root{
+  --blue:#00B4FF;
+  --blue2:#0055FF;
+  --glow:rgba(0,180,255,0.4);
+  --navy:#04091A;
+  --navy2:#08112A;
+  --navy3:#0C1B3A;
+  --card:#0F2040;
+  --white:#EEF6FF;
+  --gray:#6A8BAE;
+  --cyan:#00FFE5;
+  --green:#00FF99;
+}
+
+body{
+  font-family:'Noto Sans KR',sans-serif;
+  background:var(--navy);color:var(--white);
+  overflow-x:hidden;
+}
+
+/* ── CANVAS ── */
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 56px;height:64px;
+  background:rgba(4,9,26,0.7);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(0,180,255,0.12);
+}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo img{
+  height:36px;width:36px;object-fit:contain;
+  filter:drop-shadow(0 0 10px var(--blue));
+  /* 로고 검은 배경 제거 */
+  mix-blend-mode:screen;
+}
+.logo-text{
+  font-family:'Exo 2',sans-serif;font-weight:900;font-size:1.3rem;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-menu{display:flex;gap:28px;list-style:none}
+.nav-menu a{
+  font-size:0.85rem;font-weight:600;color:var(--gray);
+  text-decoration:none;letter-spacing:0.04em;
+  transition:color 0.2s;
+}
+.nav-menu a:hover{color:var(--white)}
+.nav-btn{
+  background:linear-gradient(135deg,var(--blue2),var(--blue));
+  color:#fff;padding:9px 22px;border-radius:8px;
+  font-size:0.82rem;font-weight:800;text-decoration:none;
+  letter-spacing:0.06em;
+  box-shadow:0 0 20px rgba(0,100,255,0.4);
+  transition:box-shadow 0.2s,transform 0.2s;
+}
+.nav-btn:hover{box-shadow:0 0 32px var(--glow);transform:translateY(-2px)}
+
+/* ── HERO ── */
+#hero{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:100px 24px 80px;
+}
+/* 스캔라인 */
+#hero::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    180deg,transparent,transparent 2px,
+    rgba(0,180,255,0.018) 2px,rgba(0,180,255,0.018) 3px
+  );pointer-events:none;
+}
+.hero-logo{
+  margin-bottom:32px;
+  animation:bob 5s ease-in-out infinite;
+}
+.hero-logo img{
+  width:180px;height:180px;object-fit:contain;
+  filter:drop-shadow(0 0 30px var(--blue)) drop-shadow(0 0 80px rgba(0,85,255,0.45));
+  mix-blend-mode:screen;
+}
+.pill{
+  display:inline-flex;align-items:center;gap:7px;
+  border:1px solid rgba(0,180,255,0.35);border-radius:100px;
+  padding:5px 18px;margin-bottom:22px;
+  font-size:0.73rem;font-weight:700;letter-spacing:0.13em;
+  color:var(--blue);background:rgba(0,180,255,0.06);
+  animation:up 0.6s ease both;
+}
+.pill::before{content:'▶';font-size:0.55rem}
+.hero h1{
+  font-family:'Exo 2',sans-serif;font-weight:900;
+  font-size:clamp(2.8rem,7vw,5.5rem);line-height:1.08;
+  animation:up 0.7s 0.1s ease both;
+}
+.hero h1 .gr{
+  display:block;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 18px var(--glow));
+}
+.hero-desc{
+  margin-top:18px;font-size:1rem;color:var(--gray);
+  line-height:1.85;max-width:500px;
+  animation:up 0.7s 0.2s ease both;
+}
+.hero-btns{
+  margin-top:36px;display:flex;gap:14px;flex-wrap:wrap;
+  justify-content:center;
+  animation:up 0.7s 0.3s ease both;
+}
+.btn-p{
+  background:linear-gradient(135deg,var(--blue2),var(--blue));
+  color:#fff;padding:13px 34px;border-radius:8px;
+  font-weight:800;font-size:0.93rem;text-decoration:none;
+  box-shadow:0 0 28px rgba(0,100,255,0.4);
+  transition:transform 0.2s,box-shadow 0.2s;letter-spacing:0.05em;
+}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 0 44px var(--glow)}
+.btn-o{
+  color:var(--blue);padding:13px 34px;border-radius:8px;
+  font-weight:700;font-size:0.93rem;text-decoration:none;
+  border:1.5px solid rgba(0,180,255,0.4);
+  transition:background 0.2s,border-color 0.2s;
+}
+.btn-o:hover{background:rgba(0,180,255,0.08);border-color:var(--blue)}
+
+/* 픽셀 바 */
+.pixels{
+  display:flex;align-items:flex-end;gap:5px;
+  margin-top:64px;opacity:0.35;
+  animation:up 0.7s 0.5s ease both;
+}
+.px{width:7px;background:var(--blue);border-radius:1px}
+
+/* ── SECTION ── */
+section{position:relative;z-index:1;padding:96px 60px}
+.lbl{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;font-weight:700;letter-spacing:0.16em;
+  color:var(--blue);margin-bottom:10px;display:block;
+}
+.ttl{
+  font-family:'Exo 2',sans-serif;font-weight:900;
+  font-size:clamp(1.9rem,3.5vw,2.7rem);line-height:1.15;
+}
+.ttl em{font-style:normal;color:var(--cyan)}
+.bar{
+  width:44px;height:3px;margin-top:16px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  border-radius:2px;
+}
+
+/* ── ABOUT ── */
+#about{background:var(--navy2)}
+.about-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:72px;align-items:center;margin-top:52px;
+}
+.about-p{color:var(--gray);line-height:1.9;font-size:0.95rem;margin-top:14px}
+.about-p strong{color:var(--cyan)}
+.tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:26px}
+.tag{
+  border:1px solid rgba(0,180,255,0.28);border-radius:5px;
+  padding:5px 15px;font-size:0.77rem;font-weight:700;
+  color:var(--blue);background:rgba(0,180,255,0.06);
+  letter-spacing:0.04em;
+}
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mc{
+  background:var(--card);border:1px solid rgba(0,180,255,0.1);
+  border-radius:12px;padding:24px 20px;
+  transition:border-color 0.25s,box-shadow 0.25s;
+}
+.mc:hover{border-color:rgba(0,180,255,0.45);box-shadow:0 0 22px rgba(0,180,255,0.1)}
+.mc-icon{font-size:1.5rem;margin-bottom:9px}
+.mc h4{font-weight:800;font-size:0.88rem;margin-bottom:5px}
+.mc p{font-size:0.76rem;color:var(--gray);line-height:1.6}
+
+/* ── CEO ── */
+#ceo{background:var(--navy)}
+.ceo-wrap{
+  margin-top:52px;background:var(--card);
+  border:1px solid rgba(0,180,255,0.14);border-radius:20px;
+  padding:52px;display:grid;
+  grid-template-columns:240px 1fr;gap:56px;
+  align-items:start;position:relative;overflow:hidden;
+}
+.ceo-wrap::after{
+  content:'';position:absolute;top:-100px;right:-100px;
+  width:350px;height:350px;
+  background:radial-gradient(circle,rgba(0,180,255,0.1) 0%,transparent 65%);
+  pointer-events:none;
+}
+.ceo-left{text-align:center}
+.avatar{
+  width:160px;height:160px;margin:0 auto;
+  border:2px solid rgba(0,180,255,0.35);border-radius:16px;
+  background:linear-gradient(135deg,var(--navy2),var(--navy3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:3.2rem;
+  box-shadow:0 0 30px rgba(0,180,255,0.15);
+}
+.ceo-name{
+  font-family:'Exo 2',sans-serif;font-weight:900;
+  font-size:1.1rem;margin-top:14px;
+}
+.ceo-role{font-size:0.76rem;color:var(--blue);font-weight:700;letter-spacing:0.08em;margin-top:4px}
+.ceo-badge{
+  display:inline-block;margin-top:11px;
+  background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.25);
+  border-radius:5px;padding:3px 13px;
+  font-size:0.7rem;color:var(--blue);font-weight:700;letter-spacing:0.06em;
+}
+.ceo-right h3{
+  font-family:'Exo 2',sans-serif;font-weight:800;
+  font-size:1.3rem;line-height:1.45;margin-bottom:18px;
+}
+.ceo-right h3 span{color:var(--blue)}
+.ceo-right p{color:var(--gray);line-height:1.95;font-size:0.93rem;margin-bottom:13px}
+.sign{
+  margin-top:26px;padding-top:18px;
+  border-top:1px dashed rgba(0,180,255,0.18);
+  font-family:'Exo 2',sans-serif;font-weight:800;font-size:1rem;
+}
+.sign span{color:var(--gray);font-size:0.8rem;font-weight:400;margin-left:6px}
+
+/* ── VALUES ── */
+#values{background:var(--navy2)}
+.val-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;margin-top:52px;
+}
+.vc{
+  background:var(--card);border:1px solid rgba(0,180,255,0.09);
+  border-radius:14px;padding:32px 26px;
+  transition:border-color 0.25s,transform 0.25s,box-shadow 0.25s;
+}
+.vc:hover{
+  border-color:rgba(0,180,255,0.45);
+  transform:translateY(-5px);
+  box-shadow:0 10px 40px rgba(0,180,255,0.1);
+}
+.vc-n{
+  font-family:'Exo 2',sans-serif;font-weight:900;font-size:2.2rem;
+  color:rgba(0,180,255,0.1);display:block;margin-bottom:-6px;
+}
+.vc-icon{
+  width:48px;height:48px;border-radius:10px;margin-bottom:16px;
+  background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.18);
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;
+}
+.vc h3{
+  font-family:'Exo 2',sans-serif;font-weight:800;
+  font-size:1rem;margin-bottom:10px;
+}
+.vc p{color:var(--gray);line-height:1.8;font-size:0.86rem}
+
+/* ── CONTACT ── */
+#contact{background:var(--navy)}
+.ct-box{
+  margin-top:52px;background:var(--card);
+  border:1px solid rgba(0,180,255,0.16);border-radius:20px;
+  padding:52px;display:flex;
+  align-items:center;justify-content:space-between;
+  gap:36px;flex-wrap:wrap;position:relative;overflow:hidden;
+}
+.ct-box::before{
+  content:'';position:absolute;bottom:-80px;left:-80px;
+  width:320px;height:320px;
+  background:radial-gradient(circle,rgba(0,180,255,0.08) 0%,transparent 65%);
+  pointer-events:none;
+}
+.ct-left h2{
+  font-family:'Exo 2',sans-serif;font-weight:900;
+  font-size:clamp(1.6rem,3vw,2.2rem);line-height:1.2;
+}
+.ct-left h2 span{color:var(--blue)}
+.ct-left p{color:var(--gray);margin-top:9px;line-height:1.7;font-size:0.9rem}
+.ct-rows{display:flex;flex-direction:column;gap:12px;min-width:270px}
+.cr{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(0,180,255,0.05);
+  border:1px solid rgba(0,180,255,0.13);border-radius:8px;
+  padding:13px 18px;font-weight:700;font-size:0.88rem;
+  transition:border-color 0.2s;
+}
+.cr:hover{border-color:rgba(0,180,255,0.45)}
+.cr a{color:var(--white);text-decoration:none}
+.cr-ic{font-size:1rem;opacity:0.75}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:1;
+  background:var(--navy2);
+  border-top:1px solid rgba(0,180,255,0.08);
+  padding:24px 56px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;
+}
+.fl{display:flex;align-items:center;gap:8px}
+.fl img{
+  height:26px;width:26px;object-fit:contain;
+  filter:drop-shadow(0 0 6px var(--blue));
+  mix-blend-mode:screen;
+}
+.fl span{
+  font-family:'Exo 2',sans-serif;font-weight:900;font-size:0.95rem;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.fi{font-size:0.76rem;color:var(--gray)}
+
+/* ── REVEAL ── */
+.rev{opacity:0;transform:translateY(26px);transition:opacity 0.6s ease,transform 0.6s ease}
+.rev.on{opacity:1;transform:translateY(0)}
+
+/* ── KEYFRAMES ── */
+@keyframes up{
+  from{opacity:0;transform:translateY(26px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes bob{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-12px)}
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:880px){
+  nav{padding:0 20px}
+  .nav-menu{display:none}
+  section{padding:70px 20px}
+  .about-grid,.ceo-wrap{grid-template-columns:1fr;gap:36px}
+  .val-grid{grid-template-columns:1fr}
+  .ct-box{flex-direction:column;padding:32px 22px}
+  footer{flex-direction:column;text-align:center;padding:20px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="logo">
+    <img src="Logo.png" alt="PerfectK"/>
+    <span class="logo-text">PerfectK</span>
+  </a>
+  <ul class="nav-menu">
+    <li><a href="#about">스튜디오</a></li>
+    <li><a href="#ceo">대표 인사말</a></li>
+    <li><a href="#values">핵심 가치</a></li>
+    <li><a href="#contact">연락처</a></li>
+  </ul>
+  <a href="#contact" class="nav-btn">CONTACT</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-logo">
+    <img src="Logo.png" alt="PerfectK Logo"/>
+  </div>
+  <div class="pill">INDIE GAME STUDIO</div>
+  <div class="hero">
+    <h1>우리가 만드는<br><span class="gr">Perfect Game</span></h1>
+    <p class="hero-desc">작지만 열정 넘치는 팀.<br>우리는 플레이어가 기억할 이야기를 만듭니다.</p>
+    <div class="hero-btns">
+      <a href="#about" class="btn-p">스튜디오 소개 ▶</a>
+      <a href="#contact" class="btn-o">연락하기</a>
+    </div>
+  </div>
+  <div class="pixels">
+    <div class="px" style="height:8px"></div>
+    <div class="px" style="height:16px"></div>
+    <div class="px" style="height:11px"></div>
+    <div class="px" style="height:24px"></div>
+    <div class="px" style="height:9px"></div>
+    <div class="px" style="height:18px"></div>
+    <div class="px" style="height:7px"></div>
+    <div class="px" style="height:14px"></div>
+    <div class="px" style="height:20px"></div>
+    <div class="px" style="height:6px"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="rev">
+    <span class="lbl">// ABOUT US</span>
+    <h2 class="ttl">PerfectK <em>스튜디오</em>입니다</h2>
+    <div class="bar"></div>
+  </div>
+  <div class="about-grid">
+    <div class="rev">
+      <p class="about-p">PerfectK는 사업자등록번호 <strong>261-81-28830</strong>의 인디게임 개발 스튜디오입니다.</p>
+      <p class="about-p">화려한 그래픽보다 <strong>탄탄한 게임플레이</strong>와 진심 어린 스토리를 추구합니다. 우리가 만든 게임을 끝까지 클리어한 플레이어가 "최고였다"고 말할 수 있도록 매일 코드 한 줄, 픽셀 하나에 집중합니다.</p>
+      <p class="about-p">작은 팀이기에 더 빠르고, 더 유연하게 움직입니다. 모든 결정에는 플레이어가 중심에 있습니다.</p>
+      <div class="tags">
+        <span class="tag">Unity</span>
+        <span class="tag">Unreal</span>
+        <span class="tag">2D / 3D</span>
+        <span class="tag">게임 기획</span>
+        <span class="tag">스토리텔링</span>
+        <span class="tag">UI/UX</span>
+      </div>
+    </div>
+    <div class="mini-grid rev">
+      <div class="mc"><div class="mc-icon">🎮</div><h4>게임 개발</h4><p>아이디어부터 출시까지 직접 개발합니다.</p></div>
+      <div class="mc"><div class="mc-icon">🎨</div><h4>아트 디렉션</h4><p>세계관에 맞는 독창적인 비주얼을 구성합니다.</p></div>
+      <div class="mc"><div class="mc-icon">📖</div><h4>스토리텔링</h4><p>플레이어가 몰입할 수 있는 서사를 씁니다.</p></div>
+      <div class="mc"><div class="mc-icon">⚙️</div><h4>엔지니어링</h4><p>안정적이고 최적화된 시스템을 구축합니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CEO -->
+<section id="ceo">
+  <div class="rev">
+    <span class="lbl">// CEO MESSAGE</span>
+    <h2 class="ttl">대표 <em>인사말</em></h2>
+    <div class="bar"></div>
+  </div>
+  <div class="ceo-wrap rev">
+    <div class="ceo-left">
+      <div class="avatar">🧑‍💻</div>
+      <div class="ceo-name">권혁정</div>
+      <div class="ceo-role">CEO &amp; FOUNDER</div>
+      <div class="ceo-badge">PerfectK Studio</div>
+    </div>
+    <div class="ceo-right">
+      <h3>"우리가 만드는 게임은<br><span>플레이어의 시간을 완벽하게</span> 보상합니다."</h3>
+      <p>안녕하세요. PerfectK 대표 권혁정입니다. 저희 스튜디오를 찾아주셔서 진심으로 감사드립니다.</p>
+      <p>저는 게임이 단순한 오락을 넘어, 사람과 사람 사이의 감동을 만드는 예술이라고 믿습니다. PerfectK는 그런 게임을 만들기 위해 설립했습니다. 큰 자본보다 더 강한 것은 좋은 아이디어와 끝까지 해내는 팀이라는 걸 믿기에, 오늘도 퍼펙트한 결과물을 향해 달려가고 있습니다.</p>
+      <p>플레이어 여러분의 시간은 소중합니다. 우리가 만드는 모든 게임은 그 시간을 충분히 보상할 수 있어야 한다고 생각합니다. 앞으로의 PerfectK를 지켜봐 주세요.</p>
+      <div class="sign">권혁정 <span>/ 대표이사, PerfectK</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section id="values">
+  <div class="rev">
+    <span class="lbl">// OUR VALUES</span>
+    <h2 class="ttl">우리가 추구하는 <em>가치</em></h2>
+    <div class="bar"></div>
+  </div>
+  <div class="val-grid">
+    <div class="vc rev">
+      <span class="vc-n">01</span>
+      <div class="vc-icon">🎯</div>
+      <h3>Player First</h3>
+      <p>모든 결정의 기준은 플레이어입니다. 그들이 즐겁고 감동받는 경험을 설계하는 것이 우리의 첫 번째 목표입니다.</p>
+    </div>
+    <div class="vc rev">
+      <span class="vc-n">02</span>
+      <div class="vc-icon">⚡</div>
+      <h3>Craft Over Hype</h3>
+      <p>화려한 마케팅보다 완성도를 먼저 생각합니다. 진짜 실력으로 만든 게임은 입소문이 답니다.</p>
+    </div>
+    <div class="vc rev">
+      <span class="vc-n">03</span>
+      <div class="vc-icon">🌱</div>
+      <h3>Keep Growing</h3>
+      <p>한 작품에서 멈추지 않습니다. 매 프로젝트마다 새로운 도전을 하며 팀과 스튜디오가 함께 성장합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="rev">
+    <span class="lbl">// CONTACT</span>
+    <h2 class="ttl">함께 <em>시작해요</em></h2>
+    <div class="bar"></div>
+  </div>
+  <div class="ct-box rev">
+    <div class="ct-left">
+      <h2>게임을 함께 만들고<br>싶으신가요? <span>연락주세요.</span></h2>
+      <p>협업, 퍼블리싱, 채용 문의 모두 환영합니다.<br>빠르게 답변드리겠습니다.</p>
+    </div>
+    <div class="ct-rows">
+      <div class="cr">
+        <span class="cr-ic">📱</span>
+        <a href="tel:01050843258">010-5084-3258</a>
+      </div>
+      <div class="cr">
+        <span class="cr-ic">🏢</span>
+        <span>사업자등록번호 261-81-28830</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fl">
+    <img src="Logo.png" alt="PerfectK"/>
+    <span>PerfectK</span>
+  </div>
+  <div class="fi">© 2024 PerfectK. All rights reserved. &nbsp;|&nbsp; 대표자 권혁정 &nbsp;|&nbsp; 사업자등록번호 261-81-28830</div>
+</footer>
+
+<script>
+/* ── 별 배경 ── */
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let W, H, stars = [];
+
+function init() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  stars = Array.from({length: 180}, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    r: Math.random() * 1.1 + 0.2,
+    a: Math.random(),
+    da: (Math.random() * 0.004 + 0.001) * (Math.random() < 0.5 ? 1 : -1)
+  }));
+}
+init();
+window.addEventListener('resize', init);
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  stars.forEach(s => {
+    s.a += s.da;
+    if (s.a > 1 || s.a < 0) s.da *= -1;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,180,255,${s.a * 0.65})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* ── 스크롤 리빌 ── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('on'), i * 90);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.rev').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
